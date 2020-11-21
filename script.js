@@ -27,7 +27,15 @@ function swapElements() {
     for (let i = 0; i < arr.length; i++) {
         if (arr[i].tempID != arr[i].constID) flag = false;
     }
-    if (flag == true) window.alert("BIG WINNER!");
+    if (flag == true) winGame();
+}
+function winGame() {
+    let image = document.getElementById("image");
+    clearInterval(dataInterval);
+    for (let i = 0; i < image.children.length; i++) {
+        image.children[i].removeEventListener("click", swapElements);
+    }
+    window.alert("BIG WINNER!\n Twój czas to: " + timerData);
 }
 function reloadOtoczka() {
     let blackHeight = 0;
@@ -61,12 +69,11 @@ function reloadElements() {
         div.style.height = arr[i].elHeight;
         div.style.float = "left";
         div.style.backgroundColor = "blue";
-        div.style.backgroundImage = "url('image.png')"
+        div.style.backgroundImage = "url('psy/pies" + currentImage + ".png')"
         div.style.backgroundPositionX = -1 * (arr[i].tempID % Math.sqrt(arr.length)) * 600 / Math.sqrt(arr.length) + "px"
         div.style.backgroundPositionY = -1 * Math.floor(arr[i].tempID / Math.sqrt(arr.length)) * 600 / Math.sqrt(arr.length) + "px"
         div.style.outline = "1px solid black"
         div.id = arr[i].constID;
-        div.innerHTML += arr[i].tempID + " " + arr[i].constID;
         if (arr[i].otoczka == true)
             div.addEventListener("click", swapElements);
 
@@ -79,11 +86,43 @@ function reloadElements() {
         image.appendChild(div);
     }
 }
+function updateTimer() {
+    let getData = new Date(Date.now() - startData);
+    timerData = "";
+
+    timerData += getData.getMilliseconds();
+    if (Math.ceil(Math.log10(getData.getMilliseconds() + 1)) < 3) {
+        timerData = "0" + timerData;
+    }
+    if (Math.ceil(Math.log10(getData.getMilliseconds() + 1)) < 2) {
+        timerData = "0" + timerData;
+    }
+    timerData = getData.getSeconds() + ":" + timerData;
+    if (Math.ceil(Math.log10(getData.getSeconds() + 1)) < 2) {
+        timerData = "0" + timerData;
+    }
+    timerData = getData.getMinutes() + ":" + timerData;
+    if (Math.ceil(Math.log10(getData.getMinutes() + 1)) < 2) {
+        timerData = "0" + timerData;
+    }
+    timerData = (getData.getHours() - 1) + ":" + timerData;
+    if (Math.ceil(Math.log10(getData.getHours() + 1)) < 2) {
+        timerData = "0" + timerData
+    }
+    let timer = document.getElementById("timer");
+    timer.innerHTML = "";
+    for (let i = 0; i < timerData.length; i++) {
+        if (timerData.charAt(i) == ":") {
+            timer.innerHTML += '<img src="cyferki/column.png">';
+        }
+        else timer.innerHTML += '<img src="cyferki/' + timerData.charAt(i) + '.png">';
+    }
+}
 function startGame() {
-    console.log("gra zaczeta")
+    startData = new Date(Date.now());
+    dataInterval = setInterval(updateTimer, 1);
 }
 function prepareGame(x) {
-
     setTimeout(function () {
         if (x > 0) {
             let kx;
@@ -122,15 +161,13 @@ function prepareGame(x) {
             prepareGame(x - 1);
         }
     }, 10);
-
     if (x == 0) startGame();
-
-
 }
 function createObjects() {
     arr = [];
     idCount = 0;
     buttonLVL = this.value;
+    currentImage = gameImage;
     for (var i = 0; i < this.value; i++) {
         for (var j = 0; j < this.value; j++) {
             let elem = {
@@ -153,6 +190,40 @@ function createObjects() {
     reloadElements();
     prepareGame(1);
 }
+function swipeLeft() {
+    let sliderImage = document.getElementById("sliderimg");
+    switch (gameImage) {
+        case 1:
+            document.getElementById("img4").scrollIntoView({ behavior: "auto" })
+            document.getElementById("img3").scrollIntoView({ behavior: "smooth" })
+            break;
+        case 2:
+            document.getElementById("img1").scrollIntoView({ behavior: "smooth" })
+            break;
+        case 3:
+            document.getElementById("img2").scrollIntoView({ behavior: "smooth" })
+            break;
+    }
+    gameImage--;
+    if (gameImage == 0) gameImage = 3;
+}
+function swipeRight() {
+    let sliderImage = document.getElementById("sliderimg");
+    switch (gameImage) {
+        case 1:
+            document.getElementById("img1").scrollIntoView({ behavior: "auto" })
+            document.getElementById("img2").scrollIntoView({ behavior: "smooth" })
+            break;
+        case 2:
+            document.getElementById("img3").scrollIntoView({ behavior: "smooth" })
+            break;
+        case 3:
+            document.getElementById("img4").scrollIntoView({ behavior: "smooth" })
+            break;
+    }
+    gameImage++;
+    if (gameImage == 4) gameImage = 1;
+}
 function createButtons() {
     let buttonVal = 3;
     for (let i = 0; i < 4; i++) {
@@ -167,8 +238,18 @@ function createButtons() {
         navbar.appendChild(guzik);
         buttonVal++;
     }
+    let leftButton = document.getElementById("leftbtn")
+    leftButton.addEventListener("click", swipeLeft)
+    let rightButton = document.getElementById("rightbtn")
+    rightButton.addEventListener("click", swipeRight)
 }
+let gameImage = 1;
+let currentImage;
 let level = 0;
 let arr = [];
+let timerData;
+let startData;
+let dataInterval;
 let swapCount = 0;
 createButtons();
+document.getElementById("img1").scrollIntoView({ behavior: "auto" });
