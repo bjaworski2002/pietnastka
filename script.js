@@ -123,6 +123,7 @@ function startGame() {
     dataInterval = setInterval(updateTimer, 1);
 }
 function prepareGame(x) {
+
     setTimeout(function () {
         if (x > 0) {
             let kx;
@@ -188,7 +189,7 @@ function createObjects() {
         }
     }
     reloadElements();
-    prepareGame(1);
+    prepareGame(400);
 }
 function swipeLeft() {
     let sliderImage = document.getElementById("sliderimg");
